@@ -67,7 +67,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'imageboard.wsgi.application'
+WSGI_APPLICATION = 'main.wsgi.application'
 
 
 # Database
