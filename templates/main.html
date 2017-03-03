@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'static/css/main.css' %}">
+</head>
+<body>
+    {% block menu %}
+    <div class="navbar navbar-inverse">
+        <div class="container container_navbar">
+            <a class="menu" href="{% url 'contacts' %}">Контакты</a>
+        </div>
+    </div>
+    <hr class="index">
+    {% endblock %}
+    {% block index %}{% endblock %}
+    {% block contacts %}{% endblock %}
+    {% block board %}{% endblock %}
+    {% block thread %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% extends 'main.html' %}
+{% block menu %}
+    <div class="navbar navbar-inverse navbar-static-top">
+        <div class="container container_navbar">
+            <a class="menu" href="{% url 'index' %}">Главная</a>
+            <a class="menu" href="{% url 'contacts' %}">Контакты</a>
+        </div>
+    </div>
+    <hr class="index">
+{% endblock %}
+{% block contacts %}
+        <h1><a class="mainlogo link_color_all"><b>Два.ч — Контакты</b></a></h1>
+        <hr>
+    <div class="container_contacts_text">
+        <p>Здесь какой-то умный текст большими буквами</p>
+    </div>
+    <div class="container container_contacts">
+        <p>Моя почта</p>
+    </div>
+    <div class="container container_contacts">
+        <p>Мой твиттер</p>
+    </div>
+{% endblock %}

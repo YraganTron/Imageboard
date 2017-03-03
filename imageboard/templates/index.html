@@ -1,0 +1,38 @@
+{% extends 'main.html' %}
+
+{% block index %}
+    <div class="board_center_text">
+        <h1><a class="mainlogo link_color_all" href="{% url 'index' %}"><b>Два.ч</b></a></h1>
+        <p class="link_color_all">Добро пожаловать. Снова.</p>
+    </div>
+    <div class="container">
+        <div class="container_index_text">
+            <p class="text_container">Глупый текст</p>
+        </div>
+    </div>
+    <div class="container">
+        <table class="table_index">
+            <tr>
+                <td class="head"><b>Доска</b></td>
+                <td class="head"><b>Название</b></td>
+                <td class="head"><b>П/ч</b></td>
+                <td class="head"><b>Уник IP</b></td>
+                <td class="head"><b>Описание</b></td>
+                <td class="head"><b>Постов</b></td>
+            </tr>
+            {% for board in boards %}
+                <tr class="tr_index_1 tr_index_2">
+                <td>
+                    <a class="link_color_table" href="{% url 'board' board.board_shortcut %}">
+                        /{{ board.board_shortcut }}/</a>
+                </td>
+                <td>{{ board.board_name }}</td>
+                <td>{{ board.board_in_hour }}</td>
+                <td>{{ board.board_active_24hour }}</td>
+                <td>{{ board.board_specification }}</td>
+                <td>{{ board.board_posts }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

@@ -1,3 +1,12 @@
-from django.shortcuts import render
+from django.views.generic import ListView, TemplateView
+from .models import Board
 
-# Create your views here.
+
+class Index(ListView):
+    model = Board
+    context_object_name = 'boards'
+    template_name = 'index.html'
+
+
+class Contacts(TemplateView):
+    template_name = 'contacts.html'
