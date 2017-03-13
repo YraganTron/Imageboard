@@ -1,8 +1,9 @@
 from django.views.generic import ListView, TemplateView, CreateView, DetailView
-from django.views.generic.edit import FormView
+from django.http import HttpResponse
 from .models import Board, Thread, Comment
-from django.shortcuts import resolve_url, redirect
+from django.shortcuts import redirect
 from .forms import CreateThread
+from django.core import serializers
 
 
 class Index(ListView):
@@ -15,7 +16,35 @@ class Contacts(TemplateView):
     template_name = 'contacts.html'
 
 
-class ThreadList(ListView):
+class AjaxThreads(object):
+
+    def render_to_json_response(self, context, **response_kwargs):
+            return HttpResponse(self.get_data(context), **response_kwargs, content_type='application/json')
+
+    def get_data(self, context):
+        if self.request.GET.get('value'):
+            x = int(self.request.GET.get('value'))
+            thread_ajax = Thread.objects.filter(board__board_shortcut=
+                                                self.kwargs['name_board']).order_by('-thread_score')
+            if x + 5 > len(thread_ajax):
+                thread_ajax = thread_ajax[x:len(thread_ajax)]
+            else:
+                thread_ajax = thread_ajax[x:x + 5]
+            comment_ajax = []
+            for x in thread_ajax:
+                if Comment.objects.filter(thread=x).count() > 3:
+                    section = Comment.objects.filter(thread=x).count() - 3
+                else:
+                    section = 0
+                if Comment.objects.filter(thread=x)[section:].count() != 0:
+                    comment_ajax.extend(list(Comment.objects.filter(thread=x)[section:]))
+            all_ajax = list(thread_ajax) + list(comment_ajax)
+            context = serializers.serialize('json', all_ajax)
+
+            return context
+
+
+class ThreadList(AjaxThreads, ListView):
     model = Thread
     context_object_name = 'threads'
     template_name = 'board.html'
@@ -36,6 +65,17 @@ class ThreadList(ListView):
         context['name_board'] = self.kwargs['name_board']
         context['board'] = Board.objects.get(board_shortcut=self.kwargs['name_board'])
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.is_ajax():
+            return self.render_to_json_response(context, **response_kwargs)
+        else:
+            return self.response_class(
+                request=self.request,
+                template=self.get_template_names(),
+                context=context,
+                using=self.template_engine,
+                **response_kwargs)
 
 
 class AddThread(CreateView):

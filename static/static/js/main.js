@@ -137,15 +137,15 @@ $(document).ready(function() {
                     dataType: 'json',
                     data: {'value': count_comment},
                     success: function (data) {
-                        for (var i = 0; i <= 4; i++) {
-                            if (data[i].model == 'boards.thread') {
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].model == 'imageboard.thread') {
                                 parse_datetime(data, i);
                                 var tmpl = _.template(document.getElementById('template-thread').innerHTML);
                                 var result = tmpl({data: data, i: i});
                                 $('.dynamic1').append(result);
                                 for (var y = 0; y <= (data.length - 1); y++) {
                                     status_hr = 0;
-                                    if (data[y].model == 'boards.comment') {
+                                    if (data[y].model == 'imageboard.comment') {
                                         if(data[y].fields.thread == data[i].pk) {
                                             parse_datetime(data, y);
                                             var answers = make_list(data, y);

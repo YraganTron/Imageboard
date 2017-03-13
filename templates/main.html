@@ -14,6 +14,50 @@
     <script src="{% static 'static/js/main.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'static/css/main.css' %}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.3.0/lodash.js"></script>
+    <script type="text/template" id="template-thread">
+        <div class="container container_board_index">
+        <span>
+            <% if (data[i].fields.thread_tittle != '') %> <b> <%= data[i].fields.thread_tittle %> </b>
+            Аноним <%= data[i].fields.thread_time %>  <a class="thread_answer" data-num="<%= data[i].pk %>">№<%= data[i].pk %></a>
+            [ <a href="/{{ name_board }}/res/<%= data[i].pk %>.html" class="link_color_all">Ответ</a> ]
+        </span><br>
+        <% if (data[i].fields.thread_image != '') { %>
+            <div class="container container_tittle_thread">
+                <a href="/upload/<%= data[i].fields.thread_image %>" class="link_color_img"> <%= data[i].fields.thread_image %></a>
+            </div>
+            <a data-lightbox="image-1" href="/upload/<%= data[i].fields.thread_image %>">
+                <img src="/upload/<%= data[i].fields.thread_image %>" width="16%" height="16%" align="left"/>
+            </a>
+        <% } %>
+        <p><%= data[i].fields.thread_text %></p>
+        <hr class="board">
+        </div>
+    </script>
+    <script type="text/template" id="template-comment">
+        <div class="container container_comments_index">
+            <div class="container_comments">
+                <span>
+                    <% if (data[y].fields.comments_tittle != '') %> <b> <%= data[y].fields.comments_tittle %> </b>
+                    Аноним <% if (data[y].fields.comments_op != '') %> <%= data[y].fields.comments_op %>
+                    <%= data[y].fields.comments_time %> <a class="reply" data-num="<%= data[y].pk %>">№<%= data[y].pk %></a>
+                </span><br>
+                <% if (data[y].fields.comments_image != '') { %>
+                        <div class="container container_tittle_thread">
+                            <a href="/upload/<%= data[y].fields.comments_image %>" class="link_color_img"><%= data[y].fields.comments_image %></a>
+                        </div>
+                        <a data-lightbox="image-1" href="/upload/<%= data[y].fields.comments_image %>">
+                            <img src="/upload/<%= data[y].fields.comments_image %>" width="16%" height="16%" align="left">
+                        </a>
+                <% } %>
+                <blockquote><%= data[y].fields.comments_text %></blockquote>
+                <% if (data[y].fields.comments_answers != '') { %>
+                <span>Ответы: <% for (var i = 0; i < answers.length; i++) { %>
+                    <a class="link-reply" data-num="<%= answers[i] %>">>><%= answers[i] %></a>
+                <% }; %></span>
+                <% }; %>
+            </div>
+        </div>
+    </script>
 </head>
 <body>
     {% block menu %}

@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^(?P<name_board>[a-z]{1,4})/$', views.ThreadList.as_view(), name='board'),
     url(r'^(?P<name_board>[a-z]{1,4})/AddThread$', views.AddThread.as_view(), name='AddThread'),
     url(r'^(?P<name_board>[a-z]{1,4})/res/(?P<pk>[0-9]{1,}).html$', views.ThreadDetail.as_view(), name='thread'),
+    #url(r'^AjaxThreads/(?P<name_board>[a-z]{1,4})$', views.AjaxThreads.as_view(), name='AjaxThreads'),
 
 ]
