@@ -58,6 +58,48 @@
             </div>
         </div>
     </script>
+    <script type="text/template" id="template-tooltip-comment">
+            <div class="tooltip container_comments" id="tooltip_comment<%= data[0].pk %>" style="left: <%= left_comment %>px; top: <%= top_comment %>px; opacity: 1">
+                <span>
+                    <% if (data[0].fields.comments_tittle != '') %> <b> <%= data[0].fields.comments_tittle %> </b>
+                    Аноним <% if (data[0].fields.comments_op != '') %> <%= data[0].fields.comments_op %>
+                    <%= data[0].fields.comments_time %> <a class="reply" data-num="<%= data[0].pk %>">№<%= data[0].pk %></a>
+                </span><br>
+                <% if (data[0].fields.comments_image != '') { %>
+                    <div class="container container_tittle_thread">
+                        <a href="/upload/<%= data[0].fields.comments_image %>" class="link_color_img"><%= data[0].fields.comments_image %></a>
+                    </div>
+                    <a data-lightbox="image-1" href="/upload/<%= data[0].fields.comments_image %>">
+                        <img src="/upload/<%= data[0].fields.comments_image %>" width="16%" height="16%" align="left">
+                    </a>
+                <% } %>
+                <blockquote><%= data[0].fields.comments_text.replace( /\n/g, "<br />") %></blockquote>
+                <% if (data[0].fields.comments_answers != '') { %>
+                    <span>Ответы: <% for (var i = 0; i < answers.length; i++) { %> <a class="link-reply" data-num="<%= answers[i] %>">>><%= answers[i] %></a><% }; %></span>
+                <% }; %>
+            </div>
+        </script>
+        <script type="text/template" id="template-tooltip-thread">
+                <div class="tooltip container_thread_tooltip" id="tooltip_thread<%= data[0].pk %>" style="left: <%= left_thread %>px; top: <%= top_thread %>px; opacity: 1">
+                    <span>
+                        <% if (data[0].fields.thread_tittle != '') %> <b> <%= data[0].fields.thread_tittle %> </b>
+                        Аноним
+                        <%= data[0].fields.thread_time %> <a class="thread_answer" data-num="<%= data[0].pk %>">№<%= data[0].pk %></a>
+                    </span><br>
+                    <% if (data[0].fields.thread_image != '') { %>
+                            <div class="container container_tittle_thread">
+                                <a href="/upload/<%= data[0].fields.thread_image %>" class="link_color_img"><%= data[0].fields.thread_image %></a>
+                            </div>
+                            <a data-lightbox="image-1" href="/upload/<%= data[0].fields.thread_image %>">
+                                <img src="/upload/<%= data[0].fields.thread_image %>" width="16%" height="16%" align="left">
+                            </a>
+                    <% } %>
+                    <blockquote><%=  data[0].fields.thread_text.replace( /\n/g, "<br />")  %></blockquote>
+                    <% if (data[0].fields.thread_answers != '') { %>
+                    <span>Ответы: <% for (var i = 0; i < answers.length; i++) { %> <a class="link-reply" data-num="<%= answers[i] %>">>><%= answers[i] %></a><% }; %></span>
+                    <% }; %>
+                </div>
+        </script>
 </head>
 <body>
     {% block menu %}

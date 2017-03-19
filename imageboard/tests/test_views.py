@@ -62,10 +62,12 @@ class ViewThreadList(TestCase):
 
     def test_context(self):
         response = self.client.get('/b/')
-        form = CreateThread()
+        form_thread = CreateThread()
+        form_comment = AddComment()
         board = Board.objects.get(board_shortcut='b')
 
-        self.assertEqual(str(response.context['form']), str(form))
+        self.assertEqual(str(response.context['form_thread']), str(form_thread))
+        self.assertEqual(str(response.context['form_comment']), str(form_comment))
         self.assertEqual(response.context['name_board'], 'b')
         self.assertEqual(response.context['board'], board)
 

@@ -1,3 +1,148 @@
+{% extends 'main.html' %}
+{% load board_tag %}
+{% block menu %}
+    <div class="navbar navbar-inverse">
+        <div class="container container_navbar">
+            <a class="menu" href="{% url 'index' %}">Главная</a>
+            <a class="menu" href="{% url 'contacts' %}">Контакты</a>
+        </div>
+    </div>
+    <hr class="index">
+{% endblock %}
 {% block thread %}
-    {{ thread }}
+     <div class="board_center_text">
+        <h1><a class="mainlogo link_color_all" href="{% url 'board' name_board %}">{{ board.board_name }}</a></h1>
+    </div>
+    <hr>
+    <div class="board_center_text">
+        [ <a class="link_color_all" id="js_thr_1">Ответить в тред</a> ]
+    </div>
+    <hr class="thread-nav_1">
+    <div class="container container-form_1">
+        <form enctype="multipart/form-data" method="post" action="{% url 'AddComment' name_board pk %}" class="container-js_1">
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>Тема</td>
+                    <td>{{ form.comments_tittle }} <input type="submit" class="button" value="Отправить"></td>
+                </tr>
+                <tr>
+                    <td>Текст</td>
+                    <td>{{ form.comments_text }}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>{{ form.comments_sage }} Sage {{ form.op }} OP треда</td>
+                </tr>
+                <tr>
+                    <td>Файл</td>
+                    <td>{{ form.comments_image }}</td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div class="thread-nav">
+    [ <a href="{% url 'board' name_board %}" class="link_color_img">Назад</a> ]
+    [ <a href="#" id="updateThread" class="link_color_img">Обновить тред</a> ]
+    </div>
+    <hr class="thread-nav_2">
+    <div class="dynamic1">
+    <div class="container container_board_index">
+        <span> {% if thread.thread_tittle %}<b>{{ thread.thread_tittle }}</b>{% endif %}
+            Аноним {{ thread.thread_time }}
+            <a class="thread_answer" data-num="{{ thread.id }}">№{{ thread.id }}</a>
+        </span><br>
+        {% if thread.thread_image %}
+            <div class="container container_tittle_thread">
+                <a href="{{ thread.thread_image.url }}" class="link_color_img">{{ thread.thread_image }}</a>
+            </div>
+            <a data-lightbox="image-1" href="{{ thread.thread_image.url }}">
+                <img src="{{ thread.thread_image.url }}" width="16%" height="16%" align="left">
+            </a>
+        {% endif %}
+        <p>{{ thread.thread_text }}</p>
+        {% if thread.thread_answers %}
+            <span><i>Ответы:</i>
+                {% for answer in thread.thread_answers|make_mylist %}
+                    <a class="link-reply" data-num="{{ answer }}">>>{{ answer }} </a>
+                {% endfor %}
+            </span>
+        {% endif %}
+    </div>
+    {% for comment in comments %}
+        <div class="container container_comments_index">
+            <div class="container_comments" id="{{ comment.id }}" >
+                <span> {% if comment.comments_tittle %}<b>{{ comment.comments_tittle }}</b>{% endif %} Аноним
+                    <span class="number-green">{{ comment.comments_op }}</span> {{ comment.comments_time }}
+                    <span class="number-green">#{{ forloop.counter }}</span>
+                    <a class="reply" data-num="{{ comment.id }}">№{{ comment.id }}</a>
+                </span><br>
+                {% if comment.comments_image %}
+                    <div class="container container_tittle_thread">
+                        <a href="{{ comment.comments_image.url }}" class="link_color_img">{{ comment.comments_image }}</a>
+                    </div>
+                    <a data-lightbox="image-1" href="{{ comment.comments_image.url }}">
+                        <img src="{{ comment.comments_image.url }}" width="16%" height="16%" align="left">
+                    </a>
+                {% endif %}
+                <blockquote>{{ comment.comments_text|my_safe|linebreaksbr }}</blockquote>
+            {% if comment.comments_answers %}
+                <span><i>Ответы:</i>
+                    {% for answer in comment.comments_answers|make_mylist %}
+                        <a class="link-reply" data-num="{{ answer }}">>>{{ answer }} </a>
+                    {% endfor %}
+                </span>
+            {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+    <hr>
+    </div>
+    <div class="board_center_text">
+        [ <a class="link_color_all" id="js_thr_2">Ответить в тред</a> ]
+    </div>
+    <div class="container container-form_2">
+    <hr>
+        <form enctype="multipart/form-data" method="post" action="{% url 'AddComment' name_board pk %}" class="container-js_2">
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>Тема</td>
+                    <td>{{ form.comments_tittle }} <input type="submit" class="button" value="Отправить"></td>
+                </tr>
+                <tr>
+                    <td>Текст</td>
+                    <td>{{ form.comments_text }}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>{{ form.comments_sage }} Sage  {{ form.op }} OP треда</td>
+                </tr>
+                <tr>
+                    <td>Файл</td>
+                    <td>{{ form.comments_image }}</td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div class="form-fixed">
+        <div class="form-fixed-header">
+            Ответить в тред
+            <span id="form-fixed-close">X</span>
+        </div>
+        <form enctype="multipart/form-data" method="post" action="{% url 'AddComment' name_board pk %}" class="container-js_3">
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>{{ form.comments_tittle }} <input type="submit" class="button" value="Отправить"></td>
+                </tr>
+                <tr>
+                    <td>{{ form.comments_text }}</td>
+                </tr>
+                <tr>
+                    <td>{{ form.comments_image }}</td>
+                </tr>
+            </table>
+        </form>
+    </div>
 {% endblock %}

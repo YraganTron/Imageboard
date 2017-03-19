@@ -22,7 +22,7 @@
         <form enctype="multipart/form-data" method="post" action="{% url 'AddThread' name_board %}" class="container-js_1">
             {% csrf_token %}
             <table>
-                {% for x in form %}
+                {% for x in form_thread %}
                 <tr>
                     <td>{% cycle 'Имя треда' 'Текст' 'Файл' %}</td>
                     <td>{{ x }} {% cycle '<input type="submit" class="button" value="Отправить">' '' '' %}</td>
@@ -37,7 +37,7 @@
     <div class="container container_board_index">
         <span> {% if thread.thread_tittle %}<b>{{ thread.thread_tittle }}</b>{% endif %}
             Аноним {{ thread.thread_time }} <a class="thread_answer" data-num="{{ thread.id }}">№{{ thread.id }}</a>
-            [ <a href="" class="link_color_all">Ответ</a> ]
+            [ <a href="{% url 'thread' name_board thread.id %}" class="link_color_all">Ответ</a> ]
         </span><br>
         {% if thread.thread_image %}
             <div class="container container_tittle_thread">
@@ -97,7 +97,7 @@
         <form enctype="multipart/form-data" method="post" action="{% url 'AddThread' name_board %}" class="container-js_2">
             {% csrf_token %}
             <table>
-                {% for x in form %}
+                {% for x in form_thread %}
                 <tr>
                     <td>{% cycle 'Имя треда' 'Текст' 'Файл' %}</td>
                     <td>{{ x }} {% cycle '<input type="submit" class="button" value="Отправить">' '' '' %}</td>
@@ -114,11 +114,15 @@
         <form enctype="multipart/form-data" method="post" action="" class="container-js_3">
             {% csrf_token %}
             <table>
-                {% for x in form %}
                 <tr>
-                    <td>{{ x }} {% cycle '<input type="submit" class="button" value="Отправить">' '' '' %}</td>
+                    <td>{{ form_comment.comments_tittle }} <input type="submit" class="button" value="Отправить"></td>
                 </tr>
-                {% endfor %}
+                <tr>
+                    <td>{{ form_comment.comments_text }}</td>
+                </tr>
+                <tr>
+                    <td>{{ form_comment.comments_image }}</td>
+                </tr>
             </table>
         </form>
     </div>

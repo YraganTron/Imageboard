@@ -5,7 +5,7 @@
 $(document).ready(function() {
 
     function make_list(data, x) {
-        if (data[x].model == 'boards.comment') {
+        if (data[x].model == 'imageboard.comment') {
             if (data[x].fields.comments_answers == '') return '';
             if (data[x].fields.comments_answers.indexOf(',')) {
                 return data[x].fields.comments_answers.split(',');
@@ -63,8 +63,8 @@ $(document).ready(function() {
             data: {'tooltip': comment},
             url: '/AjaxTooltipComment.json',
             success: function (data) {
-                var url = data[0].fields.thread + '.html';
-                $('.container-js_3').attr("action", "res/" + url);
+                var url = '/' + document.URL.split('/')[3] + '/res/' + data[0].fields.thread + '/AddComment';
+                $('.container-js_3').attr("action", url);
             }
         });
 
@@ -84,7 +84,7 @@ $(document).ready(function() {
                 data: {'tooltip': thread},
                 url: '/AjaxTooltipThread.json',
                 success: function (data) {
-                    var url = 'res/' + data[0].pk + '.html';
+                    var url = '/' + document.URL.split('/')[3] + '/res/' + data[0].pk + '/AddComment';
                     $('.container-js_3').attr('action', url);
                 }
             });
