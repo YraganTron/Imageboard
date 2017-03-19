@@ -164,6 +164,7 @@ class AddCommentView(CreateView):
 
         if self.request.POST.get('comments_sage') == 'on':
             thread.thread_score -= 3
+            thread.save()
 
         #Дописать работу с сессиями при ОП
         return redirect('thread', self.kwargs['name_board'], self.kwargs['pk'])

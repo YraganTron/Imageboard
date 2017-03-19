@@ -179,3 +179,97 @@ class ViewAjaxTooltipThread(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
+
+
+class ViewAddComment(TestCase):
+
+    def setUp(self):
+        board = Board.objects.create(
+            board_shortcut='b',
+            board_name='Бред',
+            board_specification='Бред',
+        )
+        Thread.objects.create(
+            board=board,
+            thread_text='sadasda',
+        )
+
+    def test_smoke(self):
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsdf'})
+
+        self.assertEqual(response.status_code, 302)
+
+    def test_add_comment(self):
+        response = self.client.get('/b/res/1.html')
+        comments = len(response.context['comments'])
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsdf'})
+        response = self.client.get('/b/res/1.html')
+
+        self.assertEqual(len(response.context['comments']), comments + 1)
+
+    def test_text_processing_1(self):
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': '>>1 (OP) sdfsdf'})
+        response = self.client.get('/b/res/1.html')
+
+        self.assertIn('<a class="link-reply" data-num="1 thread">>>1 (OP)</a>', str(response.content))
+
+    def test_text_processing_2(self):
+        Comment.objects.create(
+            thread=Thread.objects.get(thread_text='sadasda'),
+            comments_text='sdfsdtsdf',
+        )
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': '>>1 sdfsdfsf'})
+        response = self.client.get('/b/res/1.html')
+
+        self.assertIn('<a class="link-reply" data-num="1 comment">>>1</a>', str(response.content))
+
+    def test_text_processing_3(self):
+        Comment.objects.create(
+            thread=Thread.objects.get(thread_text='sadasda'),
+            comments_text='sdfsdtsdf',
+        )
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': '>>1 (OP) sdfsdfsf  >>1'})
+        response = self.client.get('/b/res/1.html')
+
+        self.assertIn('<a class="link-reply" data-num="1 thread">>>1 (OP)</a>', str(response.content))
+        self.assertIn('<a class="link-reply" data-num="1 comment">>>1</a>', str(response.content))
+
+    def test_answer_for_comments(self):
+        Comment.objects.create(
+            thread=Thread.objects.get(thread_text='sadasda'),
+            comments_text='sdfsdtsdf',
+        )
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>1'})
+        answers = Comment.objects.get(id=1).comments_answers
+
+        self.assertIn(str(2), answers)
+
+    def test_answer_for_threads(self):
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>1 (OP)'})
+        answers = Thread.objects.get(id=1).thread_answers
+
+        self.assertIn(str(1), answers)
+
+    def test_answers_for_comments(self):
+        Comment.objects.create(
+            thread=Thread.objects.get(thread_text='sadasda'),
+            comments_text='sdfsdtsdf',
+        )
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>1'})
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsewtr  >>1'})
+        answers = Comment.objects.get(id=1).comments_answers
+
+        self.assertIn((str(2) + ',' + str(3)), answers)
+
+    def test_answers_for_threads(self):
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>1 (OP)'})
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': 'ssdf423s  >>1 (OP)'})
+        answers = Thread.objects.get(id=1).thread_answers
+
+        self.assertIn((str(1) + ',' + str(2)), answers)
+
+    def test_sage(self):
+        thread_score = Thread.objects.get(id=1).thread_score
+        response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf', 'comments_sage': 'on'})
+
+        self.assertEqual(Thread.objects.get(id=1).thread_score, thread_score - 3)
