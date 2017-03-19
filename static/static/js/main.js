@@ -108,7 +108,7 @@ $(document).ready(function() {
     });
 
     function parse_datetime(data, y) {
-        if (data[y].model == 'boards.comment') {
+        if (data[y].model == 'imageboard.comment') {
             var parser_T = data[y].fields.comments_time.split('T');
             var parser_date = parser_T[0].split('-');
             var month = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
@@ -117,7 +117,7 @@ $(document).ready(function() {
             data[y].fields.comments_time = datetime;
             return data;
         }
-        if (data[y].model == 'boards.thread') {
+        if (data[y].model == 'imageboard.thread') {
             var parser_T = data[y].fields.thread_time.split('T');
             var parser_date = parser_T[0].split('-');
             var month = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];

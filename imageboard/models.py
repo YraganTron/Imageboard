@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F
 
 
 class Board(models.Model):
@@ -34,6 +35,14 @@ class Thread(models.Model):
         else:
             return self.thread_tittle
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        super(Thread, self).save(force_insert, force_update, using, update_fields)
+        if force_update is False:
+            board = Board.objects.get(board_shortcut=self.board)
+            board.board_posts = F('board_posts') + 1
+            board.save()
+
 
 class Comment(models.Model):
 
@@ -44,3 +53,12 @@ class Comment(models.Model):
     comments_time = models.DateTimeField(auto_now_add=True)
     comments_op = models.CharField(max_length=5, blank=True)
     comments_answers = models.TextField(blank=True)
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        super(Comment, self).save(force_insert, force_update, using, update_fields)
+        if force_update is False:
+            thread = Thread.objects.get(pk=self.thread.pk)
+            board = Board.objects.get(board_shortcut=thread.board)
+            board.board_posts = F('board_posts') + 1
+            board.save()
