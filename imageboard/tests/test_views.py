@@ -273,3 +273,35 @@ class ViewAddComment(TestCase):
         response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf', 'comments_sage': 'on'})
 
         self.assertEqual(Thread.objects.get(id=1).thread_score, thread_score - 3)
+
+
+class ViewAjaxTooltip(TestCase):
+
+    def setUp(self):
+        board = Board.objects.create(
+            board_shortcut='b',
+            board_name='Бред',
+            board_specification='Бред',
+        )
+        thread = Thread.objects.create(
+            board=board,
+            thread_text='sadasda',
+        )
+        Comment.objects.create(
+            thread=thread,
+            comments_text='sdfsdf',
+        )
+
+    def test_thread_ajaxtooltip(self):
+        response = self.client.get('/AjaxTooltip.json', {'type_tooltip': 'thread', 'num_tooltip': 1},
+                                   HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+
+    def test_comment_ajaxtooltip(self):
+        response = self.client.get('/AjaxTooltip.json', {'type_tooltip': 'comment', 'num_tooltip': 1},
+                                   HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
