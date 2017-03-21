@@ -148,7 +148,8 @@ class ThreadDetail(DetailView):
         context['form'] = self.form
         context['pk'] = self.kwargs['pk']
         thread = context['thread']
-        thread.thread_score = MySession.objects.filter(thread__contains=context['pk']).count() + 3 * context['comments'].count()
+        thread.thread_score = MySession.objects.filter(thread__contains=context['pk']).count() +\
+                              3 * context['comments'].count()
         thread.save()
         return context
 
