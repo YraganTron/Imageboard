@@ -1,9 +1,11 @@
 from django.views.generic import ListView, TemplateView, CreateView, DetailView, View
 from django.http import HttpResponse
-from .models import Board, Thread, Comment
+from .models import Board, Thread, Comment, MySession
 from django.shortcuts import redirect, get_list_or_404, get_object_or_404
 from .forms import CreateThread, AddComment
 from django.core import serializers
+from .utils import seacrh_patterns, add_answers, create_mysession_in_board, set_active_user_in_board, \
+    create_mysession_in_thread, set_active_user_in_thread
 import re
 
 
@@ -53,6 +55,7 @@ class ThreadList(AjaxThreads, ListView):
     def dispatch(self, request, *args, **kwargs):
         self.form_thread = CreateThread()
         self.form_comment = AddComment()
+        create_mysession_in_board(request, kwargs['name_board'])
         return super(ThreadList, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -84,7 +87,11 @@ class AddThread(CreateView):
         thread = form.save(commit=False)
         thread.board = Board.objects.get(board_shortcut=self.kwargs['name_board'])
         thread.save()
-        return redirect('thread', self.kwargs['name_board'], thread.id)
+        set_active_user_in_board(self.request, self.kwargs['name_board'])
+
+        response = redirect('thread', self.kwargs['name_board'], thread.id)
+        response.set_cookie('thread{}'.format(thread.id), 'op', 10368000)
+        return response
 
 
 class AddCommentView(CreateView):
@@ -98,76 +105,25 @@ class AddCommentView(CreateView):
         regs = [re.compile('>>[\d]+(?! \(OP\)|\w)'), re.compile('>>[\d]+ \(OP\)')]
         for reg in regs:
             answers = []
-            counter_pattern = 0
-            for x in re.finditer(reg, comment.comments_text):
-                counter_pattern += 1
-            count_pattern = counter_pattern
-            count_tagged_pattern = 0
-            while counter_pattern != 0:
-                iters_pattren = re.finditer(reg, comment.comments_text)
-                k = 0
-                for x in iters_pattren:
-                    if count_tagged_pattern == count_pattern - counter_pattern:
-                        if x.span()[0] == 0 and count_tagged_pattern == 0:
-                            answers.append(comment.comments_text[2:x.span()[1]])
-                            if reg == re.compile('>>[\d]+(?! \(OP\)|\w)'):
-                                comment.comments_text = '<a class="link-reply" data-num="%s">' % (
-                                comment.comments_text[2:x.span()[1]] + ' comment') + comment.comments_text[:x.span()[
-                                    1]] + '</a>' + comment.comments_text[x.span()[1]:]
-                            else:
-                                comment.comments_text = '<a class="link-reply" data-num="%s">' % (
-                                comment.comments_text[2:x.span()[1] - 5] + ' thread') + comment.comments_text[:x.span()[
-                                    1]] + '</a>' + comment.comments_text[x.span()[1]:]
-                            break
-                        else:
-                            if k == count_pattern - counter_pattern:
-                                answers.append(comment.comments_text[x.span()[0] + 2:x.span()[1]])
-                                if reg == re.compile('>>[\d]+(?! \(OP\)|\w)'):
-                                    comment.comments_text = comment.comments_text[
-                                                :x.span()[0]] + '<a class="link-reply" data-num="%s">' % (
-                                                comment.comments_text[x.span()[0] + 2:x.span()[1]] + ' comment') + \
-                                                            comment.comments_text[x.span()[0]:x.span()[1]] + '</a>' +\
-                                                            comment.comments_text[x.span()[1]:]
-                                else:
-                                    comment.comments_text = comment.comments_text[
-                                                :x.span()[0]] + '<a class="link-reply" data-num="%s">' % (
-                                                comment.comments_text[x.span()[0] + 2:x.span()[1] - 5] + ' thread') +\
-                                                            comment.comments_text[x.span()[0]:x.span()[1]] + '</a>' +\
-                                                            comment.comments_text[x.span()[1]:]
-                                break
-                    k += 1
-                count_tagged_pattern += 1
-                counter_pattern -= 1
-
+            seacrh_patterns(answers, comment, reg)
             comment.save()
-
-            for x in answers:
-                if reg == re.compile('>>[\d]+(?! \(OP\)|\w)'):
-                    comment_for_answers = Comment.objects.get(pk=x)
-                    if comment_for_answers.comments_answers == '':
-                        comment_for_answers.comments_answers = str(comment.id)
-                    else:
-                        comment_for_answers.comments_answers += ',' + str(comment.id)
-                    comment_for_answers.save()
-                else:
-                    result = re.search(r'[\d]+', x)
-                    x = result.group(0)
-                    thread_for_answers = Thread.objects.get(pk=x)
-                    if thread_for_answers.thread_answers == '':
-                        thread_for_answers.thread_answers = str(comment.id)
-                    else:
-                        thread_for_answers.thread_answers += ',' + str(comment.id)
-                    thread_for_answers.save()
-
+            add_answers(reg, comment, answers)
             comment.save()
-        form.save()
 
         if self.request.POST.get('comments_sage') == 'on':
             thread.thread_score -= 3
             thread.save()
 
-        #Дописать работу с сессиями при ОП
-        return redirect('thread', self.kwargs['name_board'], self.kwargs['pk'])
+        set_active_user_in_thread(self.request, self.kwargs['name_board'])
+
+        response = redirect('thread', self.kwargs['name_board'], self.kwargs['pk'])
+
+        if 'thread{}'.format(thread.id) in self.request.COOKIES:
+            if self.request.COOKIES['thread{}'.format(thread.id)] == 'op':
+                if self.request.POST.get('op') == 'on':
+                    comment.comments_op = '# OP'
+                    comment.save()
+        return response
 
 
 class ThreadDetail(DetailView):
@@ -177,6 +133,7 @@ class ThreadDetail(DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         self.form = AddComment()
+        create_mysession_in_thread(request, kwargs['name_board'], kwargs['pk'])
         return super(ThreadDetail, self).dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
@@ -190,6 +147,9 @@ class ThreadDetail(DetailView):
         context['board'] = Board.objects.get(board_shortcut=self.kwargs['name_board'])
         context['form'] = self.form
         context['pk'] = self.kwargs['pk']
+        thread = context['thread']
+        thread.thread_score = MySession.objects.filter(thread__contains=context['pk']).count() + 3 * context['comments'].count()
+        thread.save()
         return context
 
 

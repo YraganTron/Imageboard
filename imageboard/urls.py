@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^(?P<name_board>[a-z]{1,4})/res/(?P<pk>[0-9]{1,})/AddComment$', views.AddCommentView.as_view(), name='AddComment'),
     url(r'^AjaxTooltipComment.json$', views.AjaxTooltipComment.as_view(), name='AjaxTooltipComment'),
     url(r'^AjaxTooltipThread.json$', views.AjaxTooltipThread.as_view(), name='AjaxTooltipThread'),
-    url(r'AjaxTooltip.json$', views.AjaxTooltip.as_view(), name='AjaxTooltip'),
+    url(r'^AjaxTooltip.json$', views.AjaxTooltip.as_view(), name='AjaxTooltip'),
     url(r'^$', views.Index.as_view()),
 
 ]

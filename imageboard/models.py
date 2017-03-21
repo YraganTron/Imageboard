@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import F
+from django.contrib.sessions.models import Session
 
 
 class Board(models.Model):
@@ -37,11 +38,13 @@ class Thread(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        super(Thread, self).save(force_insert, force_update, using, update_fields)
-        if force_update is False:
+        if self.pk is None:
+            super(Thread, self).save(force_insert, force_update, using, update_fields)
             board = Board.objects.get(board_shortcut=self.board)
-            board.board_posts = F('board_posts') + 1
+            board.board_posts += + 1
             board.save()
+        else:
+            return super(Thread, self).save(force_insert, force_update, using, update_fields)
 
 
 class Comment(models.Model):
@@ -56,9 +59,20 @@ class Comment(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        super(Comment, self).save(force_insert, force_update, using, update_fields)
-        if force_update is False:
-            thread = Thread.objects.get(pk=self.thread.pk)
-            board = Board.objects.get(board_shortcut=thread.board)
-            board.board_posts = F('board_posts') + 1
-            board.save()
+        if self.pk is None:
+            super(Comment, self).save(force_insert, force_update, using, update_fields)
+            if update_fields is None and force_update is False:
+                thread = Thread.objects.get(pk=self.thread.pk)
+                board = Board.objects.get(board_shortcut=thread.board)
+                board.board_posts += 1
+                board.save()
+        else:
+            return super(Comment, self).save(force_insert, force_update, using, update_fields)
+
+
+class MySession(models.Model):
+    session_key = models.ForeignKey(Session)
+    name_board = models.CharField(max_length=1024)
+    expire_date = models.DateTimeField()
+    active = models.CharField(max_length=1024, blank=True)
+    thread = models.TextField(blank=True)
