@@ -5,6 +5,9 @@ import re
 
 
 def create_mysession_in_board(request, name_board):
+    """
+    Считаем сессии для подсчета пользователей на доске
+    """
     request.session.set_expiry(3600)
     request.session.save()
 
@@ -22,6 +25,9 @@ def create_mysession_in_board(request, name_board):
 
 
 def set_active_user_in_board(request, name_board):
+    """
+    Считаем сессии для подсчета активных пользователей на доске
+    """
     try:
         session = MySession.objects.get(session_key=request.session.session_key)
     except ObjectDoesNotExist:
@@ -38,6 +44,9 @@ def set_active_user_in_board(request, name_board):
 
 
 def create_mysession_in_thread(request, name_board, pk):
+    """
+    Считаем количество пользователей на доске + считаем количество посетивших тред для score
+    """
     request.session.set_expiry(3600)
     request.session.save()
 
@@ -61,6 +70,9 @@ def create_mysession_in_thread(request, name_board, pk):
 
 
 def set_active_user_in_thread(request, name_board):
+    """
+    Считаем количество активных пользователей на доске
+    """
     try:
         session = MySession.objects.get(session_key=request.session.session_key)
     except ObjectDoesNotExist:
@@ -78,7 +90,10 @@ def set_active_user_in_thread(request, name_board):
     session.save()
 
 
-def seacrh_patterns(answers, comment, reg):
+def search_patterns(answers, comment, reg):
+    """
+    Если были использованы ответы по id, то выделяем их тэгами cсылки
+    """
     counter_pattern = 0
     for x in re.finditer(reg, comment.comments_text):
         counter_pattern += 1
@@ -123,6 +138,9 @@ def seacrh_patterns(answers, comment, reg):
 
 
 def add_answers(reg, comment, answers):
+    """
+    Если были использованы ответы по id, то добавляем в бд к какому-то посту был какой ответ
+    """
     for x in answers:
         if reg == re.compile('>>[\d]+(?! \(OP\)|\w)'):
             comment_for_answers = Comment.objects.get(pk=x)

@@ -34,6 +34,9 @@ class AddCommentsContextNode(template.Node):
 
 @register.filter(needs_autoescape=True)
 def my_safe(text, autoescape=True):
+    """
+    Превращаем наши тэги в настоящие ссылки
+    """
     string = ''
     tags = []
     regs = [re.compile('>>[\d]+(?! \(OP\)|\w)'), re.compile('>>[\d]+ \(OP\)')]

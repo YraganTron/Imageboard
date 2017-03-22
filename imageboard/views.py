@@ -4,7 +4,7 @@ from .models import Board, Thread, Comment, MySession
 from django.shortcuts import redirect, get_list_or_404, get_object_or_404
 from .forms import CreateThread, AddComment
 from django.core import serializers
-from .utils import seacrh_patterns, add_answers, create_mysession_in_board, set_active_user_in_board, \
+from .utils import search_patterns, add_answers, create_mysession_in_board, set_active_user_in_board, \
     create_mysession_in_thread, set_active_user_in_thread
 import re
 
@@ -25,6 +25,9 @@ class AjaxThreads(object):
         return HttpResponse(self.get_data(context), **response_kwargs, content_type='application/json')
 
     def get_data(self, context):
+        """
+        Динамически загруждаем треды с комментариями
+        """
         if self.request.GET.get('value'):
             x = int(self.request.GET.get('value'))
             thread_ajax = Thread.objects.filter(
@@ -90,6 +93,7 @@ class AddThread(CreateView):
         set_active_user_in_board(self.request, self.kwargs['name_board'])
 
         response = redirect('thread', self.kwargs['name_board'], thread.id)
+        # Ставим куку для отслеживания создателя треда
         response.set_cookie('thread{}'.format(thread.id), 'op', 10368000)
         return response
 
@@ -102,10 +106,11 @@ class AddCommentView(CreateView):
         thread = Thread.objects.get(pk=self.kwargs['pk'])
         comment.thread = thread
 
+        # Проверяем были ли использованы ответы по id(tooltip) и обрабатыаем их
         regs = [re.compile('>>[\d]+(?! \(OP\)|\w)'), re.compile('>>[\d]+ \(OP\)')]
         for reg in regs:
             answers = []
-            seacrh_patterns(answers, comment, reg)
+            search_patterns(answers, comment, reg)
             comment.save()
             add_answers(reg, comment, answers)
             comment.save()
@@ -148,8 +153,8 @@ class ThreadDetail(DetailView):
         context['form'] = self.form
         context['pk'] = self.kwargs['pk']
         thread = context['thread']
-        thread.thread_score = MySession.objects.filter(thread__contains=context['pk']).count() +\
-                                3 * context['comments'].count()
+        thread.thread_score = MySession.objects.filter(thread__contains=context['pk']).count() + \
+                              3 * context['comments'].count()
         thread.save()
         return context
 
