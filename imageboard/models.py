@@ -1,11 +1,8 @@
 from django.db import models
-from django.db.models import F
 from django.contrib.sessions.models import Session
 
 
 class Board(models.Model):
-    class Meta:
-        ordering = ['board_shortcut', ]
 
     board_shortcut = models.CharField(max_length=10)
     board_name = models.TextField()
@@ -14,13 +11,14 @@ class Board(models.Model):
     board_in_hour = models.IntegerField(default=0)
     board_active_24hour = models.IntegerField(default=0)
 
+    class Meta:
+        ordering = ['board_shortcut', ]
+
     def __str__(self):
         return self.board_shortcut
 
 
 class Thread(models.Model):
-    class Meta:
-        ordering = ['-thread_time', ]
 
     board = models.ForeignKey(Board)
     thread_tittle = models.CharField(max_length=255, blank=True)
@@ -29,6 +27,9 @@ class Thread(models.Model):
     thread_time = models.DateTimeField(auto_now_add=True)
     thread_score = models.IntegerField(default=0)
     thread_answers = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-thread_time', ]
 
     def __str__(self):
         if self.thread_tittle == '':
@@ -41,7 +42,7 @@ class Thread(models.Model):
         if self.pk is None:
             super(Thread, self).save(force_insert, force_update, using, update_fields)
             board = Board.objects.get(board_shortcut=self.board)
-            board.board_posts += + 1
+            board.board_posts += 1
             board.save()
         else:
             return super(Thread, self).save(force_insert, force_update, using, update_fields)

@@ -1,0 +1,5 @@
+beautifulsoup4==4.5.3
+coverage==4.3.4
+Django==1.10.5
+olefile==0.44
+Pillow==4.0.0
