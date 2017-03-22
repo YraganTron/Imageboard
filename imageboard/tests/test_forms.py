@@ -1,11 +1,11 @@
 from django.test import TestCase
-from ..forms import CreateThread, AddComment
+from ..forms import NewThreadForm, NewCommentForm
 
 
 class FormCreateThread(TestCase):
 
     def test_init_form(self):
-        form = CreateThread()
+        form = NewThreadForm()
 
         self.assertIn('class="form_control"', str(form))
 
@@ -13,6 +13,6 @@ class FormCreateThread(TestCase):
 class FormAddComment(TestCase):
 
     def test_init_form(self):
-        form = AddComment()
+        form = NewCommentForm()
 
         self.assertIn('class="form_control"', str(form))

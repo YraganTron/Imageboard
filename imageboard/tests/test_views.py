@@ -1,6 +1,6 @@
 from django.test import TestCase
 from ..models import Board, Thread, Comment, MySession
-from ..forms import CreateThread, AddComment
+from ..forms import NewThreadForm, NewCommentForm
 
 
 class ViewIndex(TestCase):
@@ -67,8 +67,8 @@ class ViewThreadList(TestCase):
 
     def test_context(self):
         response = self.client.get('/b/')
-        form_thread = CreateThread()
-        form_comment = AddComment()
+        form_thread = NewThreadForm()
+        form_comment = NewCommentForm()
         board = Board.objects.get(board_shortcut='b')
 
         self.assertEqual(str(response.context['form_thread']), str(form_thread))
@@ -174,7 +174,7 @@ class ViewDetailThread(TestCase):
         self.assertEqual(str(response.context['comments']), str(Comment.objects.all()))
         self.assertEqual(response.context['name_board'], 'b')
         self.assertEqual(response.context['board'], Board.objects.get(board_shortcut='b'))
-        self.assertEqual(str(response.context['form']), str(AddComment()))
+        self.assertEqual(str(response.context['form']), str(NewCommentForm()))
         self.assertEqual(response.context['pk'], str(1))
 
     def test_create_mysession_one_board(self):

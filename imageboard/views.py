@@ -2,7 +2,7 @@ from django.views.generic import ListView, TemplateView, CreateView, DetailView,
 from django.http import HttpResponse
 from .models import Board, Thread, Comment, MySession
 from django.shortcuts import redirect, get_list_or_404, get_object_or_404
-from .forms import CreateThread, AddComment
+from .forms import NewThreadForm, NewCommentForm
 from django.core import serializers
 from .utils import search_patterns, add_answers, create_mysession_in_board, set_active_user_in_board, \
     create_mysession_in_thread, set_active_user_in_thread
@@ -56,8 +56,8 @@ class ThreadList(AjaxThreads, ListView):
     template_name = 'board.html'
 
     def dispatch(self, request, *args, **kwargs):
-        self.form_thread = CreateThread()
-        self.form_comment = AddComment()
+        self.form_thread = NewThreadForm()
+        self.form_comment = NewCommentForm()
         create_mysession_in_board(request, kwargs['name_board'])
         return super(ThreadList, self).dispatch(request, *args, **kwargs)
 
@@ -84,7 +84,7 @@ class ThreadList(AjaxThreads, ListView):
 
 
 class AddThread(CreateView):
-    form_class = CreateThread
+    form_class = NewThreadForm
 
     def form_valid(self, form):
         thread = form.save(commit=False)
@@ -99,7 +99,7 @@ class AddThread(CreateView):
 
 
 class AddCommentView(CreateView):
-    form_class = AddComment
+    form_class = NewCommentForm
 
     def form_valid(self, form):
         comment = form.save(commit=False)
@@ -137,7 +137,7 @@ class ThreadDetail(DetailView):
     template_name = 'thread.html'
 
     def dispatch(self, request, *args, **kwargs):
-        self.form = AddComment()
+        self.form = NewCommentForm()
         create_mysession_in_thread(request, kwargs['name_board'], kwargs['pk'])
         return super(ThreadDetail, self).dispatch(request, *args, **kwargs)
 
