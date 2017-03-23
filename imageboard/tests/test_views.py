@@ -1,6 +1,7 @@
 from django.test import TestCase
-from ..models import Board, Thread, Comment, MySession
-from ..forms import NewThreadForm, NewCommentForm
+
+from ..forms import NewCommentForm, NewThreadForm
+from ..models import Board, Comment, MySession, Thread
 
 
 class ViewIndex(TestCase):
@@ -179,7 +180,7 @@ class ViewDetailThread(TestCase):
 
     def test_create_mysession_one_board(self):
         session = self.client.session.session_key
-        response = self.client.get('/b/res/1.html')
+        self.client.get('/b/res/1.html')
         mysession = MySession.objects.get(session_key=session)
 
         self.assertEqual(mysession.name_board, 'b')
@@ -192,7 +193,7 @@ class ViewDetailThread(TestCase):
     def test_create_mysession_more_board(self):
         session = self.client.session.session_key
         self.client.get('/b/res/1.html')
-        response = self.client.get('/pr/res/2.html')
+        self.client.get('/pr/res/2.html')
         mysession = MySession.objects.get(session_key=session)
 
         self.assertEqual(mysession.name_board, 'b, pr')
@@ -201,7 +202,6 @@ class ViewDetailThread(TestCase):
         self.client.get('/b/res/1.html')
 
         self.assertEqual(mysession.thread, '1, 2')
-
 
 
 class ViewFormAddThread(TestCase):
@@ -315,7 +315,7 @@ class ViewAddComment(TestCase):
             thread=Thread.objects.get(thread_text='sadasda'),
             comments_text='sdfsdtsdf',
         )
-        response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>1'})
+        self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>1'})
         answers = Comment.objects.get(id=1).comments_answers
 
         self.assertIn(str(2), answers)

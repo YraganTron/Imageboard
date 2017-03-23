@@ -1,5 +1,6 @@
 from django.test import TestCase
-from ..forms import NewThreadForm, NewCommentForm
+
+from ..forms import NewCommentForm, NewThreadForm
 
 
 class FormCreateThread(TestCase):

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Board, Thread, Comment
+from .models import Board, Comment, Thread
 
 
 class MyModelAdmin(admin.ModelAdmin):
@@ -32,6 +32,7 @@ class ThreadAdmin(MyModelAdmin):
 
 class BoardAdmin(MyModelAdmin):
     fields = ['board_shortcut', 'board_name', 'board_specification']
+
 
 admin.site.register(Board, BoardAdmin)
 admin.site.register(Thread, ThreadAdmin)

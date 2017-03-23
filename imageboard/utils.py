@@ -1,7 +1,9 @@
-from django.contrib.sessions.models import Session
-from .models import MySession, Comment, Thread
-from django.core.exceptions import ObjectDoesNotExist
 import re
+
+from django.contrib.sessions.models import Session
+from django.core.exceptions import ObjectDoesNotExist
+
+from .models import Comment, MySession, Thread
 
 
 def create_mysession_in_board(request, name_board):
@@ -109,28 +111,28 @@ def search_patterns(answers, comment, reg):
                     if reg == re.compile('>>[\d]+(?! \(OP\)|\w)'):
                         comment.comments_text = '<a class="link-reply" data-num="%s">' % (
                             comment.comments_text[2:x.span()[1]] + ' comment') + comment.comments_text[:x.span()[1]] +\
-                                                '</a>' + comment.comments_text[x.span()[1]:]
+                            '</a>' + comment.comments_text[x.span()[1]:]
                     else:
                         comment.comments_text = '<a class="link-reply" data-num="%s">' % (
                             comment.comments_text[2:x.span()[1] - 5] + ' thread') +\
-                                                comment.comments_text[:x.span()[1]] + '</a>' +\
-                                                comment.comments_text[x.span()[1]:]
+                            comment.comments_text[:x.span()[1]] + '</a>' +\
+                            comment.comments_text[x.span()[1]:]
                     break
                 else:
                     if k == count_pattern - counter_pattern:
                         answers.append(comment.comments_text[x.span()[0] + 2:x.span()[1]])
                         if reg == re.compile('>>[\d]+(?! \(OP\)|\w)'):
                             comment.comments_text = comment.comments_text[
-                                                    :x.span()[0]] + '<a class="link-reply" data-num="%s">' % (
+                                :x.span()[0]] + '<a class="link-reply" data-num="%s">' % (
                                 comment.comments_text[x.span()[0] + 2:x.span()[1]] + ' comment') + \
-                                                    comment.comments_text[x.span()[0]:x.span()[1]] + '</a>' + \
-                                                    comment.comments_text[x.span()[1]:]
+                                comment.comments_text[x.span()[0]:x.span()[1]] + '</a>' + \
+                                comment.comments_text[x.span()[1]:]
                         else:
                             comment.comments_text = comment.comments_text[
-                                                    :x.span()[0]] + '<a class="link-reply" data-num="%s">' % (
+                                :x.span()[0]] + '<a class="link-reply" data-num="%s">' % (
                                 comment.comments_text[x.span()[0] + 2:x.span()[1] - 5] + ' thread') + \
-                                                    comment.comments_text[x.span()[0]:x.span()[1]] + '</a>' + \
-                                                    comment.comments_text[x.span()[1]:]
+                                comment.comments_text[x.span()[0]:x.span()[1]] + '</a>' + \
+                                comment.comments_text[x.span()[1]:]
                         break
             k += 1
         count_tagged_pattern += 1

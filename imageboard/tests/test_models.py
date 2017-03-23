@@ -1,5 +1,6 @@
 from django.test import TestCase
-from ..models import Board, Thread, Comment
+
+from ..models import Board, Comment, Thread
 
 
 class ModelBoard(TestCase):

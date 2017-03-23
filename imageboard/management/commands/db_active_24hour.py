@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.dispatch import Signal
-from ...signals import active
+
+from imageboard.signals.signals import active
 
 usr_active = Signal(providing_args=[])
 

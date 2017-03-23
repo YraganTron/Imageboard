@@ -1,4 +1,4 @@
-from imageboard.models import MySession, Board
+from imageboard.models import Board, MySession
 
 
 def count_usr(sender, **kwargs):

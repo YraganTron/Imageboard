@@ -1,6 +1,7 @@
 *.pyc
 db.sqlite3
 upload/
+.flake8
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

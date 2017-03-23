@@ -1,12 +1,16 @@
-from django.views.generic import ListView, TemplateView, CreateView, DetailView, View
-from django.http import HttpResponse
-from .models import Board, Thread, Comment, MySession
-from django.shortcuts import redirect, get_list_or_404, get_object_or_404
-from .forms import NewThreadForm, NewCommentForm
-from django.core import serializers
-from .utils import search_patterns, add_answers, create_mysession_in_board, set_active_user_in_board, \
-    create_mysession_in_thread, set_active_user_in_thread
 import re
+
+from django.core import serializers
+from django.http import HttpResponse
+from django.shortcuts import get_list_or_404, get_object_or_404, redirect
+from django.views.generic import (CreateView, DetailView, ListView,
+                                  TemplateView, View)
+
+from .forms import NewCommentForm, NewThreadForm
+from .models import Board, Comment, MySession, Thread
+from .utils import (add_answers, create_mysession_in_board,
+                    create_mysession_in_thread, search_patterns,
+                    set_active_user_in_board, set_active_user_in_thread)
 
 
 class Index(ListView):
@@ -153,8 +157,8 @@ class ThreadDetail(DetailView):
         context['form'] = self.form
         context['pk'] = self.kwargs['pk']
         thread = context['thread']
-        thread.thread_score = MySession.objects.filter(thread__contains=context['pk']).count() + \
-                              3 * context['comments'].count()
+        thread.thread_score = \
+            MySession.objects.filter(thread__contains=context['pk']).count() + 3 * context['comments'].count()
         thread.save()
         return context
 

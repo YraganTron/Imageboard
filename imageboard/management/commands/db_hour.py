@@ -1,9 +1,12 @@
-from django.core.management.base import BaseCommand
-from django.utils import timezone
 import datetime
-from imageboard.models import MySession, Session
+
+from django.core.management.base import BaseCommand
 from django.dispatch import Signal
-from ...signals import count_usr
+from django.utils import timezone
+
+from imageboard.models import MySession, Session
+
+from imageboard.signals.signals import count_usr
 
 usr_hour = Signal(providing_args=[])
 

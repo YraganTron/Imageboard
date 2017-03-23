@@ -1,8 +1,10 @@
+import re
+
+from bs4 import BeautifulSoup
 from django import template
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
-import re
-from bs4 import BeautifulSoup
+
 from ..models import Comment
 
 register = template.Library()
@@ -53,18 +55,20 @@ def my_safe(text, autoescape=True):
                 if count_tagged_pattern == count_pattren - counter_pattren:
                     if x.span()[0] == 0 and count_tagged_pattern == 0:
                         if reg == re.compile('>>[\d]+(?! \(OP\)|\w)'):
-                            tags.append('<a class="link-reply" data-num="%s">' %(text[2:x.span()[1]] + ' comment') + text[:x.span()[1]] + '</a>')
+                            tags.append('<a class="link-reply" data-num="%s">' % (text[2:x.span()[1]] + ' comment') + text[:x.span()[1]] + '</a>')
                         else:
-                            tags.append('<a class="link-reply" data-num="%s">' %(text[2:x.span()[1] - 5] + ' thread') + text[:x.span()[1]] + '</a>')
+                            tags.append('<a class="link-reply" data-num="%s">' % (text[2:x.span()[1] - 5] + ' thread') + text[:x.span()[1]] + '</a>')
                         break
                     else:
                         if k == count_pattren - counter_pattren:
                             if reg == re.compile('>>[\d]+(?! \(OP\)|\w)'):
-                                tags.append('<a class="link-reply" data-num="%s">' %(text[x.span()[0] +2:x.span()[1]] + ' comment') +\
-                                       text[x.span()[0]:x.span()[1]] + '</a>')
+                                tags.append('<a class="link-reply" data-num="%s">' %
+                                            (text[x.span()[0] + 2:x.span()[1]] + ' comment') +
+                                            text[x.span()[0]:x.span()[1]] + '</a>')
                             else:
-                                tags.append('<a class="link-reply" data-num="%s">' %(text[x.span()[0] + 2:x.span()[1] - 5] + ' thread') +\
-                                       text[x.span()[0]:x.span()[1]] + '</a>')
+                                tags.append('<a class="link-reply" data-num="%s">' %
+                                            (text[x.span()[0] + 2:x.span()[1] - 5] + ' thread') +
+                                            text[x.span()[0]:x.span()[1]] + '</a>')
                             break
                 k += 1
             count_tagged_pattern += 1
@@ -73,7 +77,7 @@ def my_safe(text, autoescape=True):
     soup = BeautifulSoup(text)
     soup = soup.find_all(text=True)
     for x in soup:
-        if re.fullmatch(regs[0], x) == None and re.fullmatch(regs[1], x) == None:
+        if re.fullmatch(regs[0], x) is None and re.fullmatch(regs[1], x) is None:
             string += conditional_escape(x)
         else:
             for y in tags:
