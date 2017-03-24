@@ -74,7 +74,7 @@ def my_safe(text, autoescape=True):
             count_tagged_pattern += 1
             counter_pattren -= 1
     counter = 0
-    soup = BeautifulSoup(text)
+    soup = BeautifulSoup(text, 'html.parser')
     soup = soup.find_all(text=True)
     for x in soup:
         if re.fullmatch(regs[0], x) is None and re.fullmatch(regs[1], x) is None:
