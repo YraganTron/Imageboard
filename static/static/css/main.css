@@ -118,10 +118,10 @@ h1 {
 
 hr {
     visibility: visible;
-    color: black;
+    color: lightgrey;
     width: 99%;
     height: 1px;
-    background-color: black;
+    background-color: lightgrey;
     margin-bottom: 10px;
     margin-top: 10px;
 }
