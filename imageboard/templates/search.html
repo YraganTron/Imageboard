@@ -1,0 +1,64 @@
+{% extends 'main.html' %}
+{% load board_tag %}
+
+{% block menu %}
+    <div class="navbar navbar-inverse">
+        <div class="container container_navbar">
+            <a class="menu" href="{% url 'index' %}">Главная</a>
+            <a class="menu" href="{% url 'contacts' %}">Контакты</a>
+        </div>
+    </div>
+    <hr class="index">
+{% endblock %}
+{% block search %}
+    <div class="board_center_text">
+        <h1><a class="mainlogo link_color_all" href="{% url 'board' board.board_shortcut %}">{{ board.board_name }}</a></h1>
+    </div>
+    <hr>
+    {% for post in search_posts %}
+        {% if post.comments_text %}
+        <div class="container container_comments_index">
+            <div class="container_comments">
+                <span> {% if post.comments_tittle %}<b>{{ post.comments_tittle }}</b>{% endif %} Аноним
+                    {% if post.comments_op %}{{ post.comments_op }}{% endif %}
+                    {{ post.comments_time }}
+                    <span class="posts_search">Пост:
+                        <a href="{% url 'thread' board.board_shortcut post.thread.id %}" class="reply" data-num="{{ post.id }}">№{{ post.id }}</a>
+                    </span>
+                </span><br>
+                {% if post.comments_image %}
+                    <div class="container container_tittle_thread">
+                        <a href="{{ post.comments_image.url }}" class="link_color_img">{{ post.comments_image }}</a>
+                    </div>
+                    <a data-lightbox="image-1" href="{{ post.comments_image.url }}">
+                        <img src="{{ post.comments_image.url }}" width="16%" height="16%" align="left">
+                    </a>
+                {% endif %}
+                <blockquote>{{ post.comments_text|safe|linebreaksbr }}</blockquote>
+            </div>
+        </div>
+        {% endif %}
+        {% if post.thread_text %}
+            <div class="container container_comments_index">
+            <div class="container_comments">
+        <span> {% if post.thread_tittle %}<b>{{ post.thread_tittle }}</b>{% endif %}
+            Аноним {{ post.thread_time }}
+            <span class="posts_search">Пост:
+                <a href="{% url 'thread' board.board_shortcut post.id %}" class="thread_answer" data-num="{{ post.id }}">№{{ post.id }}</a>
+            </span>
+        </span><br>
+        {% if post.thread_image %}
+            <div class="container container_tittle_thread">
+                <a href="{{ post.thread_image.url }}" class="link_color_img"> {{ post.thread_image }}</a>
+            </div>
+            <a data-lightbox="image-1" href="{{ post.thread_image.url }}">
+                <img src="{{ post.thread_image.url }}" width="16%" height="16%" align="left"/>
+            </a>
+        {% endif %}
+        <p>{{ post.thread_text }}</p>
+            </div>
+            </div>
+        {% endif %}
+        <hr>
+    {% endfor %}
+{% endblock %}

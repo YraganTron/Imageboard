@@ -1,12 +1,13 @@
 import re
 
 from django.core import serializers
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_list_or_404, get_object_or_404, redirect
 from django.views.generic import (CreateView, DetailView, ListView,
                                   TemplateView, View)
 
-from .forms import NewCommentForm, NewThreadForm
+from .forms import NewCommentForm, NewThreadForm, SearchForm
 from .models import Board, Comment, MySession, Thread
 from .utils import (add_answers, create_mysession_in_board,
                     create_mysession_in_thread, search_patterns,
@@ -62,6 +63,7 @@ class ThreadList(AjaxThreads, ListView):
     def dispatch(self, request, *args, **kwargs):
         self.form_thread = NewThreadForm()
         self.form_comment = NewCommentForm()
+        self.form_search = SearchForm()
         create_mysession_in_board(request, kwargs['name_board'])
         return super(ThreadList, self).dispatch(request, *args, **kwargs)
 
@@ -76,6 +78,7 @@ class ThreadList(AjaxThreads, ListView):
         context = super(ThreadList, self).get_context_data(**kwargs)
         context['form_thread'] = self.form_thread
         context['form_comment'] = self.form_comment
+        context['form_search'] = self.form_search
         context['name_board'] = self.kwargs['name_board']
         context['board'] = Board.objects.get(board_shortcut=self.kwargs['name_board'])
         return context
@@ -151,7 +154,7 @@ class ThreadDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ThreadDetail, self).get_context_data(**kwargs)
-        context['comments'] = Comment.objects.filter(thread=self.kwargs['pk'])
+        context['comments'] = Comment.objects.filter(thread=self.kwargs['pk']).order_by('comments_time')
         context['name_board'] = self.kwargs['name_board']
         context['board'] = Board.objects.get(board_shortcut=self.kwargs['name_board'])
         context['form'] = self.form
@@ -160,6 +163,29 @@ class ThreadDetail(DetailView):
         thread.thread_score = \
             MySession.objects.filter(thread__contains=context['pk']).count() + 3 * context['comments'].count()
         thread.save()
+        return context
+
+
+class SearchView(ListView):
+    context_object_name = 'search_posts'
+    template_name = 'search.html'
+
+    def get_queryset(self):
+        threads = \
+            Thread.objects.filter(
+                Q(board__board_shortcut=self.request.GET.get('board')) &
+                (Q(thread_text__icontains=self.request.GET.get('search'))) |
+                Q(thread_tittle__icontains=self.request.GET.get('search')))
+        comments = \
+            Comment.objects.filter(
+                Q(thread__board__board_shortcut=self.request.GET.get('board')) &
+                (Q(comments_tittle__icontains=self.request.GET.get('search')) |
+                 Q(comments_text__icontains=self.request.GET.get('search'))))
+        return list(threads) + list(comments)
+
+    def get_context_data(self, **kwargs):
+        context = super(SearchView, self).get_context_data(**kwargs)
+        context['board'] = Board.objects.get(board_shortcut=self.request.GET.get('board'))
         return context
 
 

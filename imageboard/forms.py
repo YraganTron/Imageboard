@@ -30,3 +30,11 @@ class NewCommentForm(forms.ModelForm):
     class Meta(object):
         model = Comment
         fields = ['comments_tittle', 'comments_text', 'comments_sage', 'op', 'comments_image']
+
+
+class SearchForm(forms.Form):
+    search = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super(SearchForm, self).__init__(*args, **kwargs)
+        self.fields['search'].widget.attrs.update({'placeholder': 'Поиск [enter]'})

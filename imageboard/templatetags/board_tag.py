@@ -29,7 +29,7 @@ class AddCommentsContextNode(template.Node):
                 section = Comment.objects.filter(thread=x).count() - 3
             else:
                 section = 0
-            comments.append(Comment.objects.filter(thread=x)[section:])
+            comments.append(Comment.objects.filter(thread=x).order_by('comments_time')[section:])
         context['comments'] = comments
         return ''
 

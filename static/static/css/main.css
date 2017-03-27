@@ -277,3 +277,12 @@ blockquote {
 .thread-nav {
     padding-left: 15px;
 }
+
+.search {
+    font-size: 0.8em;
+    margin-left: 15px;
+}
+
+.posts_search {
+    margin-left: 5px;
+}

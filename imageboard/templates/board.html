@@ -17,6 +17,11 @@
     <div class="board_center_text">
         [ <a class="link_color_all" id="js_thr_1">Создать тред</a> ]
     </div>
+    <hr>
+    <form enctype="multipart/form-data" method="get" action="{% url 'search' %}" class="search">
+        {{ form_search.search }}
+        <input type="hidden" name="board" value="{{ name_board }}">
+    </form>
     <div class="container container-form_1">
     <hr>
         <form enctype="multipart/form-data" method="post" action="{% url 'AddThread' name_board %}" class="container-js_1">
@@ -73,7 +78,7 @@
                                     <img src="{{ x.comments_image.url }}" width="16%" height="16%" align="left">
                                 </a>
                             {% endif %}
-                            <blockquote>{{ x.comments_text|safe|linebreaksbr }}</blockquote>
+                            <blockquote>{{ x.comments_text|my_safe|linebreaksbr }}</blockquote>
                         {% if x.comments_answers %}
                             <span><i>Ответы: </i>
                                 {% for answer in x.comments_answers|make_mylist %}
