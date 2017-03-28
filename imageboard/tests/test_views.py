@@ -5,6 +5,7 @@ from ..models import Board, Comment, MySession, Thread
 
 
 class ViewIndex(TestCase):
+    fixtures = ['Imageboard.json']
 
     def test_status_code_index(self):
         response = self.client.get('/')
@@ -14,6 +15,7 @@ class ViewIndex(TestCase):
 
 
 class ViewContacts(TestCase):
+    fixtures = ['Imageboard.json']
 
     def test_status_code_contacts(self):
         response = self.client.get('/contacts.html')
@@ -23,22 +25,7 @@ class ViewContacts(TestCase):
 
 
 class ViewThreadList(TestCase):
-
-    def setUp(self):
-        board = Board.objects.create(
-            board_shortcut='b',
-            board_name='Бред',
-            board_specification='Бред',
-        )
-        Thread.objects.create(
-            board=board,
-            thread_text='sadasda',
-        )
-        Board.objects.create(
-            board_shortcut='pr',
-            board_name='pr',
-            board_specification='pr',
-        )
+    fixtures = ['Imageboard.json']
 
     def test_status200_code_ThreadList(self):
         response = self.client.get('/b/')
@@ -54,7 +41,7 @@ class ViewThreadList(TestCase):
     def test_len_thread(self):
         response = self.client.get('/b/')
 
-        self.assertEqual(len(response.context['threads']), 1)
+        self.assertEqual(len(response.context['threads']), 2)
 
     def test_len_threads(self):
         for x in range(1, 6):
@@ -104,7 +91,7 @@ class ViewThreadList(TestCase):
             )
         response = self.client.get('/b/', {'value': '5'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-        self.assertEqual(len(response.json()), 2)
+        self.assertEqual(len(response.json()), 4)
 
     def test_ajax_comments_over_three(self):
         for x in range(1, 6):
@@ -119,7 +106,7 @@ class ViewThreadList(TestCase):
                 )
         response = self.client.get('/b/', {'value': '5'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-        self.assertEqual(len(response.json()), 4)
+        self.assertEqual(len(response.json()), 8)
 
     def test_create_mysession_one_board(self):
         session = self.client.session.session_key
@@ -142,26 +129,7 @@ class ViewThreadList(TestCase):
 
 
 class ViewDetailThread(TestCase):
-
-    def setUp(self):
-        board_1 = Board.objects.create(
-            board_name='b',
-            board_shortcut='b',
-            board_specification='b',
-        )
-        board_2 = Board.objects.create(
-            board_name='pr',
-            board_shortcut='pr',
-            board_specification='pr',
-        )
-        Thread.objects.create(
-            board=board_1,
-            thread_text='sfsdfsdfs'
-        )
-        Thread.objects.create(
-            board=board_2,
-            thread_text='asdasdasd',
-        )
+    fixtures = ['Imageboard.json']
 
     def test_smoke(self):
         response = self.client.get('/b/res/1.html')
@@ -172,7 +140,7 @@ class ViewDetailThread(TestCase):
     def test_context(self):
         response = self.client.get('/b/res/1.html')
 
-        self.assertEqual(str(response.context['comments']), str(Comment.objects.all()))
+        self.assertEqual(str(response.context['comments']), str(Comment.objects.filter(thread__id=1).order_by('comments_time')))
         self.assertEqual(response.context['name_board'], 'b')
         self.assertEqual(response.context['board'], Board.objects.get(board_shortcut='b'))
         self.assertEqual(str(response.context['form']), str(NewCommentForm()))
@@ -205,18 +173,7 @@ class ViewDetailThread(TestCase):
 
 
 class ViewFormAddThread(TestCase):
-
-    def setUp(self):
-        Board.objects.create(
-            board_name='Bred',
-            board_shortcut='b',
-            board_specification='Bred',
-        )
-        Board.objects.create(
-            board_name='pr',
-            board_shortcut='pr',
-            board_specification='pr',
-        )
+    fixtures = ['Imageboard.json']
 
     def test_smoke(self):
         response = self.client.post('/b/AddThread', {'thread_text': 'thsdnasf'})
@@ -253,22 +210,7 @@ class ViewFormAddThread(TestCase):
 
 
 class ViewAddComment(TestCase):
-
-    def setUp(self):
-        board = Board.objects.create(
-            board_shortcut='b',
-            board_name='Бред',
-            board_specification='Бред',
-        )
-        Thread.objects.create(
-            board=board,
-            thread_text='sadasda',
-        )
-        Board.objects.create(
-            board_shortcut='pr',
-            board_name='pr',
-            board_specification='pr',
-        )
+    fixtures = ['Imageboard.json']
 
     def test_smoke(self):
         response = self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsdf'})
@@ -290,20 +232,12 @@ class ViewAddComment(TestCase):
         self.assertIn('<a class="link-reply" data-num="1 thread">>>1 (OP)</a>', str(response.content))
 
     def test_text_processing_2(self):
-        Comment.objects.create(
-            thread=Thread.objects.get(thread_text='sadasda'),
-            comments_text='sdfsdtsdf',
-        )
         self.client.post('/b/res/1/AddComment', {'comments_text': '>>1 sdfsdfsf'})
         response = self.client.get('/b/res/1.html')
 
         self.assertIn('<a class="link-reply" data-num="1 comment">>>1</a>', str(response.content))
 
     def test_text_processing_3(self):
-        Comment.objects.create(
-            thread=Thread.objects.get(thread_text='sadasda'),
-            comments_text='sdfsdtsdf',
-        )
         self.client.post('/b/res/1/AddComment', {'comments_text': '>>1 (OP) sdfsdfsf  >>1'})
         response = self.client.get('/b/res/1.html')
 
@@ -311,14 +245,10 @@ class ViewAddComment(TestCase):
         self.assertIn('<a class="link-reply" data-num="1 comment">>>1</a>', str(response.content))
 
     def test_answer_for_comments(self):
-        Comment.objects.create(
-            thread=Thread.objects.get(thread_text='sadasda'),
-            comments_text='sdfsdtsdf',
-        )
-        self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>1'})
-        answers = Comment.objects.get(id=1).comments_answers
+        self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>2'})
+        answers = Comment.objects.get(id=2).comments_answers
 
-        self.assertIn(str(2), answers)
+        self.assertIn(str(5), answers)
 
     def test_answer_for_threads(self):
         self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>1 (OP)'})
@@ -327,22 +257,18 @@ class ViewAddComment(TestCase):
         self.assertIn(str(1), answers)
 
     def test_answers_for_comments(self):
-        Comment.objects.create(
-            thread=Thread.objects.get(thread_text='sadasda'),
-            comments_text='sdfsdtsdf',
-        )
-        self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>1'})
-        self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsewtr  >>1'})
-        answers = Comment.objects.get(id=1).comments_answers
+        self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>2'})
+        self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsewtr  >>2'})
+        answers = Comment.objects.get(id=2).comments_answers
 
-        self.assertIn((str(2) + ',' + str(3)), answers)
+        self.assertIn((str(7) + ',' + str(8)), answers)
 
     def test_answers_for_threads(self):
         self.client.post('/b/res/1/AddComment', {'comments_text': 'sdfsdfsf  >>1 (OP)'})
         self.client.post('/b/res/1/AddComment', {'comments_text': 'ssdf423s  >>1 (OP)'})
         answers = Thread.objects.get(id=1).thread_answers
 
-        self.assertIn((str(1) + ',' + str(2)), answers)
+        self.assertIn((str(9) + ',' + str(10)), answers)
 
     def test_sage(self):
         thread_score = Thread.objects.get(id=1).thread_score
@@ -355,7 +281,7 @@ class ViewAddComment(TestCase):
         cookies['thread1'] = 'op'
         self.client.post('/b/res/1/AddComment', {'comments_text': 'werwetwetw', 'op': 'on'})
 
-        self.assertEqual('# OP', Comment.objects.get(id=1).comments_op)
+        self.assertEqual('# OP', Comment.objects.get(id=11).comments_op)
 
     def test_set_active_user_one_thread(self):
         session = self.client.session.session_key
@@ -380,21 +306,7 @@ class ViewAddComment(TestCase):
 
 
 class ViewAjaxTooltip(TestCase):
-
-    def setUp(self):
-        board = Board.objects.create(
-            board_shortcut='b',
-            board_name='Бред',
-            board_specification='Бред',
-        )
-        thread = Thread.objects.create(
-            board=board,
-            thread_text='sadasda',
-        )
-        Comment.objects.create(
-            thread=thread,
-            comments_text='sdfsdf',
-        )
+    fixtures = ['Imageboard.json']
 
     def test_thread_ajaxtooltip(self):
         response = self.client.get('/AjaxTooltip.json', {'type_tooltip': 'thread', 'num_tooltip': 1},
@@ -412,21 +324,7 @@ class ViewAjaxTooltip(TestCase):
 
 
 class ViewAjaxTooltipComment(TestCase):
-
-    def setUp(self):
-        board = Board.objects.create(
-            board_shortcut='b',
-            board_name='Бред',
-            board_specification='Бред',
-        )
-        thread = Thread.objects.create(
-            board=board,
-            thread_text='sadasda',
-        )
-        Comment.objects.create(
-            thread=thread,
-            comments_text='sdfwerwetwt',
-        )
+    fixtures = ['Imageboard.json']
 
     def test_smoke(self):
         response = self.client.get('/AjaxTooltipComment.json', {'tooltip': 1}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -436,17 +334,7 @@ class ViewAjaxTooltipComment(TestCase):
 
 
 class ViewAjaxTooltipThread(TestCase):
-
-    def setUp(self):
-        board = Board.objects.create(
-            board_shortcut='b',
-            board_name='Бред',
-            board_specification='Бред',
-        )
-        Thread.objects.create(
-            board=board,
-            thread_text='sadasda',
-        )
+    fixtures = ['Imageboard.json']
 
     def test_smoke(self):
         response = self.client.get('/AjaxTooltipThread.json', {'tooltip': 1}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')

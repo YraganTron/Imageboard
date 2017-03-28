@@ -1,0 +1,104 @@
+[
+{
+    "model": "imageboard.board",
+    "pk": 1,
+    "fields": {
+        "board_shortcut": "b",
+        "board_name": "\u0411\u0440\u0435\u0434",
+        "board_specification": "\u0411\u0440\u0435\u0434",
+        "board_posts": 5,
+        "board_in_hour": 1,
+        "board_active_24hour": 0
+    }
+},
+{
+    "model": "imageboard.board",
+    "pk": 2,
+    "fields": {
+        "board_shortcut": "pr",
+        "board_name": "\u041f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435",
+        "board_specification": "Python",
+        "board_posts": 1,
+        "board_in_hour": 0,
+        "board_active_24hour": 0
+    }
+},
+{
+    "model": "imageboard.thread",
+    "pk": 1,
+    "fields": {
+        "board": 1,
+        "thread_tittle": "WEBM",
+        "thread_text": "\u041f\u043e\u0435\u0445\u0430\u043b\u0438",
+        "thread_image": "",
+        "thread_time": "2017-03-24T15:46:03.164Z",
+        "thread_score": 8,
+        "thread_answers": "1"
+    }
+},
+{
+    "model": "imageboard.thread",
+    "pk": 2,
+    "fields": {
+        "board": 1,
+        "thread_tittle": "JPG",
+        "thread_text": "\u041f\u043e\u0435\u0445\u0430\u043b\u0438 \u0441\u043d\u043e\u0432\u0430",
+        "thread_image": "",
+        "thread_time": "2017-03-24T15:51:13.621Z",
+        "thread_score": 5,
+        "thread_answers": "3"
+    }
+},
+{
+    "model": "imageboard.thread",
+    "pk": 3,
+    "fields": {
+        "board": 2,
+        "thread_tittle": "Python",
+        "thread_text": "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c",
+        "thread_image": "",
+        "thread_time": "2017-03-25T16:21:04.652Z",
+        "thread_score": 0,
+        "thread_answers": ""
+    }
+},
+{
+    "model": "imageboard.comment",
+    "pk": 1,
+    "fields": {
+        "thread": 1,
+        "comments_tittle": "",
+        "comments_text": "<a class=\"link-reply\" data-num=\"1 thread\">>>1 (OP)</a>\r\n\u0423\u0440\u0430!",
+        "comments_image": "",
+        "comments_time": "2017-03-24T15:46:39.469Z",
+        "comments_op": "",
+        "comments_answers": "2"
+    }
+},
+{
+    "model": "imageboard.comment",
+    "pk": 2,
+    "fields": {
+        "thread": 1,
+        "comments_tittle": "",
+        "comments_text": "<a class=\"link-reply\" data-num=\"1 comment\">>>1</a>\r\n1",
+        "comments_image": "",
+        "comments_time": "2017-03-27T16:15:48.358Z",
+        "comments_op": "",
+        "comments_answers": ""
+    }
+},
+{
+    "model": "imageboard.comment",
+    "pk": 3,
+    "fields": {
+        "thread": 2,
+        "comments_tittle": "",
+        "comments_text": "<a class=\"link-reply\" data-num=\"2 thread\">>>2 (OP)</a>\r\nwebm test",
+        "comments_image": "",
+        "comments_time": "2017-03-27T16:22:00.693Z",
+        "comments_op": "",
+        "comments_answers": ""
+    }
+}
+]
