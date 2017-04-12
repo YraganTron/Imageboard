@@ -140,7 +140,8 @@ class ViewDetailThread(TestCase):
     def test_context(self):
         response = self.client.get('/b/res/1.html')
 
-        self.assertEqual(str(response.context['comments']), str(Comment.objects.filter(thread__id=1).order_by('comments_time')))
+        self.assertEqual(str(response.context['comments']), str(Comment.objects.filter(thread__id=1)
+                                                                .order_by('comments_time')))
         self.assertEqual(response.context['name_board'], 'b')
         self.assertEqual(response.context['board'], Board.objects.get(board_shortcut='b'))
         self.assertEqual(str(response.context['form']), str(NewCommentForm()))

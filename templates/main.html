@@ -1,4 +1,5 @@
 {% load static %}
+{% load tz_detect %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -119,5 +120,6 @@
     {% block board %}{% endblock %}
     {% block thread %}{% endblock %}
     {% block search %}{% endblock %}
+    {% tz_detect %}
 </body>
 </html>

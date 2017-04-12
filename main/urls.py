@@ -20,5 +20,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^tz_detect/', include('tz_detect.urls')),
     url(r'^', include('imageboard.urls'), name='imageboard'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
