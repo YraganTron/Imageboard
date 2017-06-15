@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import widgets
 
-from .models import Comment, Thread
+from imageboard.models import Comment, Thread
 
 
 class NewThreadForm(forms.ModelForm):

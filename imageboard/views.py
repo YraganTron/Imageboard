@@ -7,9 +7,9 @@ from django.shortcuts import get_list_or_404, get_object_or_404, redirect
 from django.views.generic import (CreateView, DetailView, ListView,
                                   TemplateView, View)
 
-from .forms import NewCommentForm, NewThreadForm, SearchForm
-from .models import Board, Comment, MySession, Thread
-from .utils import (add_answers, create_mysession_in_board,
+from imageboard.forms import NewCommentForm, NewThreadForm, SearchForm
+from imageboard.models import Board, Comment, MySession, Thread
+from imageboard.utils import (add_answers, create_mysession_in_board,
                     create_mysession_in_thread, search_patterns,
                     set_active_user_in_board, set_active_user_in_thread)
 

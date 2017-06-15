@@ -3,7 +3,7 @@ import re
 from django.contrib.sessions.models import Session
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Comment, MySession, Thread
+from imageboard.models import Comment, MySession, Thread
 
 
 def create_mysession_in_board(request, name_board):

@@ -5,7 +5,7 @@ from django import template
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-from ..models import Comment
+from imageboard.models import Comment
 
 register = template.Library()
 
